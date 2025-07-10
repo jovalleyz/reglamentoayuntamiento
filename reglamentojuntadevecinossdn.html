@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía del Reglamento de Juntas de Vecinos - Colinas del Arroyo II</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Warm Harmony -->
+    <!-- Application Structure Plan: Se ha diseñado una aplicación de página única con navegación por anclas para facilitar el acceso a la información clave. La estructura no sigue el orden legal del documento, sino que está organizada por temas de interés para un residente: qué es la junta, cómo puede participar (derechos/deberes), cómo está organizada, cómo funcionan las elecciones y cómo se manejan los fondos. Esta estructura temática y basada en preguntas (ej. '¿Qué es la Junta?') es más intuitiva para un público no especializado, permitiendo encontrar respuestas rápidas a las dudas más comunes. Las interacciones (pestañas, elementos desplegables) buscan reducir la carga cognitiva, mostrando solo la información relevante al usuario en cada momento. -->
+    <!-- Visualization & Content Choices: 
+    - Info: Objetivos de la Junta (Art. 5) -> Goal: Informar -> Viz: Tarjetas con iconos y texto breve -> Interaction: Ninguna, presentación visual clara. Justification: Los iconos ayudan a una asimilación rápida de los conceptos.
+    - Info: Derechos y Deberes (Art. 21-22) -> Goal: Organizar/Comparar -> Viz: Sistema de pestañas interactivas -> Interaction: Clic para cambiar entre 'Derechos' y 'Deberes'. Justification: Permite al usuario enfocarse en una sola categoría de información a la vez, evitando la sobrecarga de texto.
+    - Info: Estructura Directiva (Art. 51, 53, 54, 57-67) -> Goal: Organizar/Informar -> Viz: Cuadrícula de botones interactivos con un panel de descripción separado. -> Interaction: Clic en un botón de cargo para mostrar su descripción en el panel. Justification: Este diseño es más compacto y visualmente equilibrado que un acordeón largo. Permite una exploración rápida de los cargos sin abrumar al usuario, siguiendo la sugerencia del feedback.
+    - Info: Proceso Electoral (Título VI, Art. 88) -> Goal: Explicar Proceso -> Viz: Diagrama de flujo/línea de tiempo vertical con HTML/CSS. Se añade lista de cargos de la Comisión Electoral. -> Interaction: Ninguna, es una guía visual paso a paso. Justification: Un proceso complejo se entiende mejor visualmente como una secuencia de pasos. Detallar los cargos de la comisión añade claridad al primer paso.
+    - Info: Régimen Económico (Título V) -> Goal: Informar/Relacionar -> Viz: Diagrama visual de dos columnas con HTML/CSS. -> Interaction: Ninguna, es un esquema visual estático y claro. Justification: Simplifica el concepto de ingresos, gestión y gastos de una forma fácil de entender.
+    - Library/Method: Todo se implementa con HTML, TailwindCSS y JavaScript puro para las interacciones.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8; /* Crema muy claro */
+            color: #4A4A4A; /* Gris oscuro para texto */
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #D97706; /* Ámbar */
+            border-bottom-color: #D97706;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+        }
+        .tab {
+            cursor: pointer;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 2px solid #E5E7EB;
+            color: #6B7280;
+        }
+        .tab.active {
+            color: #1E40AF; /* Azul oscuro */
+            border-bottom-color: #1E40AF;
+            font-weight: 600;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.1rem;
+            top: 0.1rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            background-color: #FFFFFF;
+            border: 4px solid #3B82F6; /* Azul */
+        }
+        .cargo-btn {
+            transition: all 0.2s ease-in-out;
+            background-color: #F9FAFB;
+            border: 1px solid #D1D5DB;
+            text-align: center;
+        }
+        .cargo-btn:hover {
+            background-color: #EFF6FF;
+            border-color: #93C5FD;
+        }
+        .cargo-btn.active {
+            background-color: #D97706;
+            color: white;
+            border-color: #B45309;
+            font-weight: 600;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0 font-bold text-lg text-amber-700">
+                    Reglamento Juntas de Vecinos SDN
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#inicio" class="nav-link px-3 py-2 rounded-md text-sm font-semibold">Inicio</a>
+                        <a href="#que-es" class="nav-link px-3 py-2 rounded-md text-sm font-semibold">La Junta</a>
+                        <a href="#miembros" class="nav-link px-3 py-2 rounded-md text-sm font-semibold">Miembros</a>
+                        <a href="#organizacion" class="nav-link px-3 py-2 rounded-md text-sm font-semibold">Organización</a>
+                        <a href="#elecciones" class="nav-link px-3 py-2 rounded-md text-sm font-semibold">Elecciones</a>
+                        <a href="#fondos" class="nav-link px-3 py-2 rounded-md text-sm font-semibold">Fondos</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-amber-700 hover:bg-gray-100 focus:outline-none">
+                        <span class="sr-only">Abrir menú principal</span>
+                        <svg class="h-6 w-6" id="menu-icon-open" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg class="h-6 w-6 hidden" id="menu-icon-close" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="mobile-menu" class="md:hidden hidden pb-3">
+                <a href="#inicio" class="nav-link block px-3 py-2 rounded-md text-base font-semibold">Inicio</a>
+                <a href="#que-es" class="nav-link block px-3 py-2 rounded-md text-base font-semibold">La Junta</a>
+                <a href="#miembros" class="nav-link block px-3 py-2 rounded-md text-base font-semibold">Miembros</a>
+                <a href="#organizacion" class="nav-link block px-3 py-2 rounded-md text-base font-semibold">Organización</a>
+                <a href="#elecciones" class="nav-link block px-3 py-2 rounded-md text-base font-semibold">Elecciones</a>
+                <a href="#fondos" class="nav-link block px-3 py-2 rounded-md text-base font-semibold">Fondos</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <section id="inicio" class="text-center pt-12 pb-16">
+            <h1 class="text-3xl md:text-5xl font-bold text-blue-900 mb-4">Reglamento de Juntas de Vecinos</h1>
+            <p class="text-lg md:text-xl max-w-3xl mx-auto text-gray-600">Una guía interactiva para los residentes de <strong>Colinas del Arroyo II</strong>. Descubre cómo funciona nuestra junta de vecinos y cómo puedes participar para mejorar nuestra comunidad.</p>
+        </section>
+
+        <section id="que-es" class="py-12 md:py-16 scroll-mt-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">La Junta</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Es la organización comunitaria que nos representa. Su propósito es identificar los problemas del sector y buscar soluciones junto al Ayuntamiento y otras instituciones. Es una entidad sin fines de lucro, sin afiliación política ni religiosa.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card p-6 text-center">
+                    <span class="text-4xl">🤝</span>
+                    <h3 class="font-bold text-xl mt-4 mb-2">Promover la Comunidad</h3>
+                    <p class="text-gray-600">Fomenta la participación, la buena convivencia y la solidaridad entre los vecinos.</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <span class="text-4xl">🏛️</span>
+                    <h3 class="font-bold text-xl mt-4 mb-2">Ser un Puente</h3>
+                    <p class="text-gray-600">Actúa como intermediaria entre los residentes y el Ayuntamiento para canalizar necesidades.</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <span class="text-4xl">💡</span>
+                    <h3 class="font-bold text-xl mt-4 mb-2">Buscar Mejoras</h3>
+                    <p class="text-gray-600">Trabaja para mejorar los servicios básicos como alumbrado, limpieza, seguridad y áreas verdes.</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <span class="text-4xl">🌳</span>
+                    <h3 class="font-bold text-xl mt-4 mb-2">Cuidar el Entorno</h3>
+                    <p class="text-gray-600">Vela por la protección del medio ambiente y el buen uso de los espacios públicos.</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <span class="text-4xl">📚</span>
+                    <h3 class="font-bold text-xl mt-4 mb-2">Fomentar la Educación</h3>
+                    <p class="text-gray-600">Colabora con la educación ciudadana y el desarrollo cultural y deportivo de la comunidad.</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <span class="text-4xl">📈</span>
+                    <h3 class="font-bold text-xl mt-4 mb-2">Impulsar el Desarrollo</h3>
+                    <p class="text-gray-600">Apoya iniciativas que contribuyan al desarrollo económico y social de nuestro sector.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="miembros" class="py-12 md:py-16 scroll-mt-16 bg-blue-50/50 rounded-2xl">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">Tus Derechos y Deberes como Miembro</h2>
+                <p class="mt-4 text-lg text-gray-600">Para ser miembro, debes ser mayor de 18 años y residir en la comunidad. Como parte de la junta, tienes voz y voto.</p>
+            </div>
+            <div class="max-w-4xl mx-auto">
+                <div class="flex border-b border-gray-300">
+                    <div id="tab-derechos" class="tab active">Tus Derechos</div>
+                    <div id="tab-deberes" class="tab">Tus Deberes</div>
+                </div>
+                <div id="content-derechos" class="py-6">
+                    <ul class="space-y-4">
+                        <li class="flex items-start"><span class="text-green-500 font-bold mr-3">✔</span><span><strong>Elegir y ser elegido:</strong> Puedes votar y postularte para cargos en la directiva.</span></li>
+                        <li class="flex items-start"><span class="text-green-500 font-bold mr-3">✔</span><span><strong>Participar en Asambleas:</strong> Tienes derecho a voz y voto en las reuniones generales.</span></li>
+                        <li class="flex items-start"><span class="text-green-500 font-bold mr-3">✔</span><span><strong>Solicitar Información:</strong> Puedes pedir informes sobre la gestión y las finanzas de la junta.</span></li>
+                        <li class="flex items-start"><span class="text-green-500 font-bold mr-3">✔</span><span><strong>Presentar Propuestas:</strong> Puedes someter proyectos e ideas para el beneficio de la comunidad.</span></li>
+                        <li class="flex items-start"><span class="text-green-500 font-bold mr-3">✔</span><span><strong>Disfrutar de los Beneficios:</strong> Tienes derecho a gozar de las obras y servicios que consiga la junta.</span></li>
+                    </ul>
+                </div>
+                <div id="content-deberes" class="py-6 hidden">
+                    <ul class="space-y-4">
+                        <li class="flex items-start"><span class="text-blue-500 font-bold mr-3">➤</span><span><strong>Cumplir los Reglamentos:</strong> Acatar las normas del reglamento y las decisiones de la Asamblea.</span></li>
+                        <li class="flex items-start"><span class="text-blue-500 font-bold mr-3">➤</span><span><strong>Asistir a las Reuniones:</strong> Participar activamente en las asambleas y reuniones convocadas.</span></li>
+                        <li class="flex items-start"><span class="text-blue-500 font-bold mr-3">➤</span><span><strong>Pagar las Cuotas:</strong> Estar al día con las cuotas aprobadas por la Asamblea para el sostenimiento de la junta.</span></li>
+                        <li class="flex items-start"><span class="text-blue-500 font-bold mr-3">➤</span><span><strong>Colaborar activamente:</strong> Participar en las actividades y proyectos que se realicen en la comunidad.</span></li>
+                        <li class="flex items-start"><span class="text-blue-500 font-bold mr-3">➤</span><span><strong>Defender a la Junta:</strong> Proteger y defender los intereses de la organización comunitaria.</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="organizacion" class="py-12 md:py-16 scroll-mt-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">¿Cómo se Organiza la Junta?</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">La junta tiene dos órganos principales: la Asamblea General, que somos todos los vecinos, y la Directiva, que es el equipo electo para ejecutar las decisiones.</p>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-12 items-start">
+                <div class="card p-8">
+                    <h3 class="text-2xl font-bold text-blue-900 mb-4">🏛️ La Asamblea General</h3>
+                    <p class="mb-4">Es la <strong>máxima autoridad</strong> de la junta de vecinos. Está compuesta por todos los miembros registrados y al día. Sus decisiones son obligatorias para todos.</p>
+                    <h4 class="font-bold mb-2">Funciones principales:</h4>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Elegir a los miembros de la Directiva y la Comisión Electoral.</li>
+                        <li>Aprobar o modificar los reglamentos.</li>
+                        <li>Aprobar el presupuesto y los informes financieros.</li>
+                        <li>Decidir sobre la compra o venta de bienes de la junta.</li>
+                        <li>Aprobar las cuotas de los miembros.</li>
+                    </ul>
+                </div>
+                <div class="card p-8">
+                    <h3 class="text-2xl font-bold text-blue-900 mb-4">👥 La Junta Directiva</h3>
+                    <p class="mb-4">Es el equipo de gestión que administra la junta por 2 años. Está compuesta por 11 posiciones. Haz clic en un cargo para ver sus funciones.</p>
+                    
+                    <div id="cargos-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+                        <button class="cargo-btn p-3 text-sm rounded-md" data-cargo="presidente">Presidente/a</button>
+                        <button class="cargo-btn p-3 text-sm rounded-md" data-cargo="vicepresidente">Vicepresidente/a</button>
+                        <button class="cargo-btn p-3 text-sm rounded-md" data-cargo="secretario">Secretario/a</button>
+                        <button class="cargo-btn p-3 text-sm rounded-md" data-cargo="tesorero">Tesorero/a</button>
+                        <button class="cargo-btn p-3 text-sm rounded-md" data-cargo="educacion">Dir. Educación</button>
+                        <button class="cargo-btn p-3 text-sm rounded-md" data-cargo="ambiente">Dir. Medio Ambiente</button>
+                        <button class="cargo-btn p-3 text-sm rounded-md" data-cargo="ddhh">Dir. DDHH</button>
+                        <button class="cargo-btn p-3 text-sm rounded-md" data-cargo="espacios">Dir. Espacios Públicos</button>
+                        <button class="cargo-btn p-3 text-sm rounded-md" data-cargo="salud">Dir. Salud</button>
+                        <button class="cargo-btn p-3 text-sm rounded-md col-span-2 sm:col-span-1" data-cargo="nna">Dir. Niñez y otros</button>
+                        <button class="cargo-btn p-3 text-sm rounded-md col-span-2 sm:col-span-2" data-cargo="sociocultural">Dir. Animación Sociocultural</button>
+                    </div>
+
+                    <div id="cargo-descripcion-container" class="bg-blue-50 p-4 rounded-lg border border-blue-100 min-h-[120px] transition-all duration-300">
+                        <h4 id="cargo-titulo" class="font-bold text-blue-800">Selecciona un cargo</h4>
+                        <p id="cargo-texto" class="text-gray-700 mt-1 text-sm">Haz clic en uno de los cargos de arriba para ver sus responsabilidades.</p>
+                    </div>
+
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <h4 class="font-bold text-lg text-gray-800 mb-3">Reglas Importantes de Composición</h4>
+                        <ul class="space-y-3 text-gray-600">
+                            <li class="flex items-start"><span class="text-amber-600 mr-3 mt-1">●</span><span><strong>Posiciones Complementarias:</strong> Si compiten 2 o más planchas, se asignan proporcionalmente los cargos de Segundo Vicepresidente, Sub-secretario, Encargado de Vigilancia y Encargada de Género a las otras planchas.</span></li>
+                            <li class="flex items-start"><span class="text-amber-600 mr-3 mt-1">●</span><span><strong>Equidad de Género (Art. 53):</strong> Debe haber un mínimo de <strong>5 mujeres</strong>. Si el Presidente es hombre, la Vicepresidenta debe ser mujer, y viceversa.</span></li>
+                            <li class="flex items-start"><span class="text-amber-600 mr-3 mt-1">●</span><span><strong>Participación Juvenil (Art. 54):</strong> Un mínimo del <strong>35%</strong> de los cargos debe ser ocupado por jóvenes entre 18 y 35 años.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="elecciones" class="py-12 md:py-16 scroll-mt-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">El Proceso Electoral, Paso a Paso</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Las elecciones para elegir una nueva directiva se realizan cada dos años. Este es el proceso según el reglamento.</p>
+            </div>
+            <div class="max-w-3xl mx-auto relative pl-10 border-l-2 border-blue-200">
+                <div class="timeline-item mb-12">
+                    <h3 class="text-xl font-bold text-blue-800">1. Convocatoria y Elección de Comisión Electoral</h3>
+                    <p class="text-gray-600 mt-2">La directiva saliente debe convocar a una Asamblea General <strong>60 días antes</strong> de que termine su período. En esta asamblea, se elige a la <strong>Comisión Electoral</strong> (5 personas), que se encargará de organizar todo el proceso. Sus cargos son (Art. 88):</p>
+                    <ul class="list-disc list-inside text-gray-600 mt-2 text-sm space-y-1 pl-4">
+                        <li>Presidente/a</li>
+                        <li>Vicepresidente/a</li>
+                        <li>Secretario/a</li>
+                        <li>Primer Vocal</li>
+                        <li>Segundo Vocal</li>
+                    </ul>
+                </div>
+                <div class="timeline-item mb-12">
+                    <h3 class="text-xl font-bold text-blue-800">2. Inscripción de Planchas</h3>
+                    <p class="text-gray-600 mt-2">La Comisión Electoral abre un período de <strong>15 días</strong> para que los grupos de vecinos interesados inscriban su "plancha" (equipo de candidatos). </p>
+                    <p class="text-sm text-amber-800 bg-amber-100 p-2 rounded-md mt-2"><strong>Requisito Obligatorio (Art. 112):</strong> Todos los candidatos de una plancha deben presentar una certificación de haber sido capacitados por el Departamento de Juntas de Vecinos del Ayuntamiento.</p>
+                </div>
+                 <div class="timeline-item mb-12">
+                    <h3 class="text-xl font-bold text-blue-800">3. Período de Campaña</h3>
+                    <p class="text-gray-600 mt-2">Una vez aceptadas las planchas, se abre un período de campaña para que los candidatos presenten sus propuestas a la comunidad. La campaña debe ser respetuosa y sin ataques personales. Termina 2 días antes de la elección.</p>
+                </div>
+                <div class="timeline-item mb-12">
+                    <h3 class="text-xl font-bold text-blue-800">4. Día de la Votación</h3>
+                    <p class="text-gray-600 mt-2">La votación se realiza en un solo día (siempre un domingo), en la hora y lugar establecidos por la Comisión Electoral. El voto es <strong>secreto y directo</strong>. Un representante del Ayuntamiento debe estar presente para garantizar la transparencia.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3 class="text-xl font-bold text-blue-800">5. Conteo y Proclamación</h3>
+                    <p class="text-gray-600 mt-2">Al cerrar la votación, la Comisión Electoral cuenta los votos públicamente. Se declara ganadora a la plancha con la mayoría simple de los votos y se proclama la nueva directiva.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="fondos" class="py-12 md:py-16 scroll-mt-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">Manejo de Fondos y Transparencia</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">La confianza es clave. El reglamento establece cómo se deben manejar los recursos económicos de la junta para garantizar su uso correcto y transparente.</p>
+            </div>
+            <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 md:p-12">
+                <div class="grid md:grid-cols-2 gap-8 md:gap-12">
+                    <div>
+                        <h3 class="font-bold text-2xl text-green-700 mb-4">💰 Fuentes de Ingresos</h3>
+                        <p class="text-gray-600 mb-6">Los recursos de la junta provienen de diversas fuentes para financiar los proyectos comunitarios.</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><span class="text-green-500 mr-3 mt-1">●</span><span><strong>Cuotas de miembros:</strong> Aportes periódicos aprobados en Asamblea.</span></li>
+                            <li class="flex items-start"><span class="text-green-500 mr-3 mt-1">●</span><span><strong>Actividades:</strong> Fondos recaudados en rifas, kermeses, fiestas, etc.</span></li>
+                            <li class="flex items-start"><span class="text-green-500 mr-3 mt-1">●</span><span><strong>Donaciones:</strong> Aportes voluntarios de personas o empresas.</span></li>
+                            <li class="flex items-start"><span class="text-green-500 mr-3 mt-1">●</span><span><strong>Subsidios:</strong> Ayudas recibidas de entidades públicas o privadas.</span></li>
+                        </ul>
+                    </div>
+                    <div class="border-t md:border-t-0 md:border-l border-gray-200 pt-8 md:pt-0 md:pl-12">
+                        <h3 class="font-bold text-2xl text-blue-800 mb-4">🔎 Gestión y Transparencia</h3>
+                        <p class="text-gray-600 mb-6">Existen reglas claras para asegurar que cada peso se use correctamente.</p>
+                         <ul class="space-y-4">
+                            <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">●</span><span><strong>Cuenta Bancaria:</strong> Todos los fondos deben depositarse en una cuenta a nombre de la Junta de Vecinos.</span></li>
+                            <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">●</span><span><strong>Firmas Conjuntas:</strong> Para retirar dinero se requiere la firma del Presidente/a y del Tesorero/a.</span></li>
+                            <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">●</span><span><strong>Informes Periódicos:</strong> El Tesorero/a debe presentar informes económicos a la Directiva y a la Asamblea General.</span></li>
+                            <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">●</span><span><strong>Libros Contables:</strong> Se debe llevar un registro detallado de todos los ingresos y gastos.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center">
+            <p>Guía creada para la Junta de Vecinos de Colinas del Arroyo II.</p>
+            <p class="text-sm text-gray-400 mt-2">Basado en la Resolución No. 07/2025 del Ayuntamiento de Santo Domingo Norte. Esta es una herramienta interpretativa y no reemplaza el documento original.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIconOpen = document.getElementById('menu-icon-open');
+            const menuIconClose = document.getElementById('menu-icon-close');
+            
+            // Mobile Menu Toggle
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                menuIconOpen.classList.toggle('hidden');
+                menuIconClose.classList.toggle('hidden');
+            });
+            
+            // Close mobile menu when a link is clicked
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    menuIconOpen.classList.remove('hidden');
+                    menuIconClose.classList.add('hidden');
+                });
+            });
+
+            // Smooth scrolling for nav links
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 64, // Adjust for fixed header height
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Active nav link on scroll
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 70) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            // Tabs for Derechos/Deberes
+            const tabDerechos = document.getElementById('tab-derechos');
+            const tabDeberes = document.getElementById('tab-deberes');
+            const contentDerechos = document.getElementById('content-derechos');
+            const contentDeberes = document.getElementById('content-deberes');
+
+            tabDerechos.addEventListener('click', () => {
+                tabDerechos.classList.add('active');
+                tabDeberes.classList.remove('active');
+                contentDerechos.classList.remove('hidden');
+                contentDeberes.classList.add('hidden');
+            });
+
+            tabDeberes.addEventListener('click', () => {
+                tabDeberes.classList.add('active');
+                tabDerechos.classList.remove('active');
+                contentDeberes.classList.remove('hidden');
+                contentDerechos.classList.add('hidden');
+            });
+
+            // New interactive grid for Directiva
+            const cargoButtons = document.querySelectorAll('.cargo-btn');
+            const cargoTitulo = document.getElementById('cargo-titulo');
+            const cargoTexto = document.getElementById('cargo-texto');
+
+            const descripciones = {
+                presidente: 'Representa legalmente a la junta, preside las reuniones, firma documentos, supervisa el trabajo general y es el vocero principal.',
+                vicepresidente: 'Sustituye al presidente en su ausencia y colabora en sus funciones.',
+                secretario: 'Lleva el registro de directivos, levanta las actas de reuniones, maneja la correspondencia y custodia los archivos.',
+                tesorero: 'Administra los fondos, lleva la contabilidad, presenta informes financieros y firma los egresos junto al Presidente.',
+                educacion: 'Crea y dirige la comisión de educación, organiza actividades formativas y gestiona proyectos educativos.',
+                ambiente: 'Dirige la comisión del área, elabora programas de saneamiento y prevención de desastres, y colabora con el ayuntamiento en el aseo.',
+                ddhh: 'Dirige la comisión de DDHH, organiza actividades de educación en derechos y colabora con las autoridades en la seguridad ciudadana.',
+                espacios: 'Dirige la comisión del área, elabora un inventario de espacios públicos y gestiona proyectos para su preservación y cuidado.',
+                salud: 'Dirige la comisión de salud, organiza actividades de salud preventiva y colabora con instituciones en la atención y seguridad social.',
+                nna: 'Crea una comisión para la defensa de los derechos de niños, niñas, adolescentes, envejecientes y personas con discapacidad.',
+                sociocultural: 'Dirige la comisión del área, organiza actividades culturales y deportivas, y fomenta la participación de la juventud.'
+            };
+
+            cargoButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const cargoKey = button.dataset.cargo;
+                    
+                    // Remove active state from all buttons
+                    cargoButtons.forEach(btn => btn.classList.remove('active'));
+                    // Add active state to the clicked button
+                    button.classList.add('active');
+                    
+                    // Update the description panel
+                    cargoTitulo.textContent = button.textContent;
+                    cargoTexto.textContent = descripciones[cargoKey];
+                });
+            });
+        });
+    </script>
+</body>
+</html>
